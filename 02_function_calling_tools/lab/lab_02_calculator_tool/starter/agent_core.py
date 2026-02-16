@@ -66,33 +66,44 @@ def get_ai_response_with_tools(
     if response_message.tool_calls:
         logger.info(f"Model initiated {len(response_message.tool_calls)} tool call(s).")
 
-        # TODO: Append the assistant's message (with tool_calls) to messages
-        # Hint: messages.append({
-        #     "role": "assistant",
-        #     "content": response_message.content,
-        #     "tool_calls": response_message.tool_calls
-        # })
+        # Append the assistant's message (with tool_calls) to messages
+        messages.append({
+            "role": "assistant",
+            "content": response_message.content,
+            "tool_calls": response_message.tool_calls
+        })
+        
+        # Loop through each tool_call
+        for tool_call in response_message.tool_calls:
+            # 1. Extract tool_name
+            tool_name = tool_call.function.name
+            
+            # 2. Parse arguments
+            try:
+                arguments = json.loads(tool_call.function.arguments)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse tool arguments: {e}")
+                arguments = {}
+            
+            # 3. Execute the tool
+            result = execute_tool(tool_name, arguments)
+            logger.info(f"Tool {tool_name} returned: {result}")
+            
+            # 4. Append the tool result message to messages
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result)
+            })
+            
+            # 5. Collect results
+            tool_results.append(result)
 
-        # TODO: Loop through each tool_call and:
-        # 1. Extract tool_name from tool_call.function.name
-        # 2. Parse arguments with json.loads(tool_call.function.arguments)
-        #    (wrap in try/except for JSONDecodeError!)
-        # 3. Execute the tool: result = execute_tool(tool_name, arguments)
-        # 4. Append the tool result message to messages:
-        #    messages.append({
-        #        "role": "tool",
-        #        "tool_call_id": tool_call.id,
-        #        "content": json.dumps(result)
-        #    })
-        # 5. Collect results in tool_results list
-
-        # TODO: Make the second API call with updated messages
-        # second_response = client.chat.completions.create(
-        #     model=model, messages=messages, temperature=0.1
-        # )
-        # response_text = second_response.choices[0].message.content
-
-        response_text = "Tool calling not yet implemented."  # Remove this line
+        # Make the second API call with updated messages
+        second_response = client.chat.completions.create(
+            model=model, messages=messages, temperature=0.1
+        )
+        response_text = second_response.choices[0].message.content
     else:
         # No tool calls — direct text response
         response_text = response_message.content

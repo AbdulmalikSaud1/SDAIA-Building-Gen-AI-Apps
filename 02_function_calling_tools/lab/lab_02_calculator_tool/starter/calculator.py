@@ -79,14 +79,22 @@ def execute_calculation(operation: str, operand_a: float, operand_b: float) -> D
     error = None
 
     try:
-        # TODO: Implement the operation logic
-        # - "add": operand_a + operand_b
-        # - "subtract": operand_a - operand_b
-        # - "multiply": operand_a * operand_b
-        # - "divide": operand_a / operand_b (handle division by zero!)
-        # - "pow": operand_a ** operand_b
-        # - anything else: set error to "Unsupported operation: {operation}"
-        pass
+        # Implement the operation logic
+        if operation == "add":
+            result = operand_a + operand_b
+        elif operation == "subtract":
+            result = operand_a - operand_b
+        elif operation == "multiply":
+            result = operand_a * operand_b
+        elif operation == "divide":
+            if operand_b == 0:
+                error = "Cannot divide by zero"
+            else:
+                result = operand_a / operand_b
+        elif operation == "pow":
+            result = operand_a ** operand_b
+        else:
+            error = f"Unsupported operation: {operation}"
     except Exception as e:
         error = f"Calculation error: {str(e)}"
 
