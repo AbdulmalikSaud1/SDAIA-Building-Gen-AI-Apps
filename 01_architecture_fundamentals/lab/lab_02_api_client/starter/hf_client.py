@@ -21,8 +21,9 @@ def get_api_token():
             "HUGGINGFACE_API_TOKEN not found. "
             "Create a .env file with your token or set the environment variable."
         )
-    if not token.startswith("hf_"):
-        raise ValueError("Invalid Hugging Face token format.")
+    # Accept both HuggingFace (hf_) and OpenRouter (sk-or-v1-) tokens
+    if not (token.startswith("hf_") or token.startswith("sk-or-v1-")):
+        raise ValueError("Invalid token format. Expected HuggingFace (hf_) or OpenRouter (sk-or-v1-) token.")
     return token
 
 
@@ -32,10 +33,13 @@ class HuggingFaceClient:
     Handles retries, cold starts, and rate limits.
     """
 
-    BASE_URL = "https://api-inference.huggingface.co/models/"
+    BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 
     def __init__(self, token: str, max_retries: int = 3, retry_delay: float = 5.0):
-        self.headers = {"Authorization": f"Bearer {token}"}
+        self.headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
@@ -48,13 +52,29 @@ class HuggingFaceClient:
         - 429: Rate limited — backs off exponentially
         - Timeout — retries with delay
         """
-        url = f"{self.BASE_URL}{model_id}"
+        url = self.BASE_URL
         response = None
+        
+        # Convert HF-style payload to OpenRouter chat format
+        if "inputs" in payload:
+            user_message = payload["inputs"]
+            openrouter_payload = {
+                "model": model_id,
+                "messages": [{"role": "user", "content": user_message}]
+            }
+            # Add parameters if present
+            if "parameters" in payload:
+                if "max_new_tokens" in payload["parameters"]:
+                    openrouter_payload["max_tokens"] = payload["parameters"]["max_new_tokens"]
+                if "temperature" in payload["parameters"]:
+                    openrouter_payload["temperature"] = payload["parameters"]["temperature"]
+        else:
+            openrouter_payload = payload
 
         for attempt in range(self.max_retries):
             try:
                 response = requests.post(
-                    url, headers=self.headers, json=payload, timeout=120
+                    url, headers=self.headers, json=openrouter_payload, timeout=120
                 )
 
                 if response.status_code == 200:
@@ -70,7 +90,13 @@ class HuggingFaceClient:
                 # - Continue to the next attempt
                 # =============================================================
 
-                # Your code here (503 handling)
+                # Solution:
+                if response.status_code == 503:
+                    estimated_time = response.json().get("estimated_time", 30)
+                    wait_time = min(estimated_time, 60)
+                    print(f"Model loading... waiting {wait_time}s (attempt {attempt + 1}/{self.max_retries})")
+                    time.sleep(wait_time)
+                    continue
 
                 # =============================================================
                 # TODO 2: Handle 429 — Rate limited
@@ -83,7 +109,12 @@ class HuggingFaceClient:
                 # - Continue to the next attempt
                 # =============================================================
 
-                # Your code here (429 handling)
+                # Solution:
+                if response.status_code == 429:
+                    wait_time = self.retry_delay * (2 ** attempt)
+                    print(f"Rate limited. Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                    continue
 
                 # Other errors — raise immediately
                 response.raise_for_status()
@@ -98,8 +129,13 @@ class HuggingFaceClient:
                 # - If this was the last attempt, re-raise the exception
                 # =============================================================
 
-                # Your code here (timeout handling)
-                raise  # Remove this line once you implement the handler
+                # Solution:
+                print(f"Request timed out (attempt {attempt + 1}/{self.max_retries})")
+                if attempt < self.max_retries - 1:
+                    time.sleep(self.retry_delay)
+                    continue
+                else:
+                    raise
 
         raise RuntimeError(
             f"Failed after {self.max_retries} attempts. "
@@ -110,7 +146,7 @@ class HuggingFaceClient:
     # --- Helper methods (complete — no changes needed) ---
 
     def text_generation(
-        self, prompt: str, model: str = "mistralai/Mistral-7B-Instruct-v0.3"
+        self, prompt: str, model: str = "openrouter/auto"
     ) -> str:
         """Generate text from a prompt."""
         result = self.query(
@@ -124,23 +160,27 @@ class HuggingFaceClient:
                 },
             },
         )
-        return result[0]["generated_text"]
+        # OpenRouter returns chat completion format
+        return result["choices"][0]["message"]["content"]
 
     def summarization(
-        self, text: str, model: str = "facebook/bart-large-cnn"
+        self, text: str, model: str = "openrouter/auto"
     ) -> str:
         """Summarize a long text into a shorter version."""
         result = self.query(
             model,
-            {"inputs": text, "parameters": {"max_length": 130, "min_length": 30}},
+            {"inputs": f"Summarize this text in 2-3 sentences: {text}", "parameters": {"max_length": 130, "min_length": 30}},
         )
-        return result[0]["summary_text"]
+        # OpenRouter returns chat completion format
+        return result["choices"][0]["message"]["content"]
 
     def text_classification(
-        self, text: str, model: str = "distilbert-base-uncased-finetuned-sst-2-english"
-    ) -> list:
+        self, text: str, model: str = "openrouter/auto"
+    ) -> str:
         """Classify text sentiment or category."""
-        return self.query(model, {"inputs": text})
+        result = self.query(model, {"inputs": f"Classify the sentiment of this text as POSITIVE or NEGATIVE: {text}"})
+        # OpenRouter returns chat completion format
+        return result["choices"][0]["message"]["content"]
 
 
 # --- Main: test all three task types ---

@@ -1,0 +1,55 @@
+{
+    "id": "gen-1771213574-xJ6MpxGmABCLPyPYoDqo",
+    "provider": "OpenAI",
+    "model": "openai/gpt-5-nano",
+    "object": "chat.completion",
+    "created": 1771213575,
+    "choices": [
+        {
+            "logprobs": null,
+            "finish_reason": "length",
+            "native_finish_reason": "max_output_tokens",
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "",
+                "refusal": null,
+                "reasoning": "**Defining retrieval-augmented generation**\n\nI need to provide a clear and informative answer to the user's question about retrieval-augmented generation. This concept involves using an external knowledge source to improve the process of generating responses. It's about enhancing AI capabilities by retrieving relevant information to support the answer generation, which can lead to more accurate and contextually relevant output. I’ll keep it concise, yet ensure all important aspects are covered for the user!**Explaining retrieval-augmented generation**\n\nI need to provide a clear yet informative answer to the user's question about retrieval-augmented generation. It's crucial that I break down the concept into understandable parts, highlighting how it combines retrieval techniques with generation models to improve response quality. I want to make the explanation concise while ensuring it captures the essence of what this approach entails. This way, the user can grasp the idea effectively without being overwhelmed.",
+                "reasoning_details": [
+                    {
+                        "format": "openai-responses-v1",
+                        "index": 0,
+                        "type": "reasoning.summary",
+                        "summary": "**Defining retrieval-augmented generation**\n\nI need to provide a clear and informative answer to the user's question about retrieval-augmented generation. This concept involves using an external knowledge source to improve the process of generating responses. It's about enhancing AI capabilities by retrieving relevant information to support the answer generation, which can lead to more accurate and contextually relevant output. I’ll keep it concise, yet ensure all important aspects are covered for the user!**Explaining retrieval-augmented generation**\n\nI need to provide a clear yet informative answer to the user's question about retrieval-augmented generation. It's crucial that I break down the concept into understandable parts, highlighting how it combines retrieval techniques with generation models to improve response quality. I want to make the explanation concise while ensuring it captures the essence of what this approach entails. This way, the user can grasp the idea effectively without being overwhelmed."
+                    },
+                    {
+                        "id": "rs_0efb255f50369f740169929307a90481909773f67108facd06",
+                        "format": "openai-responses-v1",
+                        "index": 0,
+                        "type": "reasoning.encrypted",
+                        "data": "gAAAAABpkpMLjvEB6XysDaDNcRKSUWhwdS3UwDbd5a1zJVjkfOz4gnD13Qe5DSG5s4afaHLipjl2RC5BCcpj-tS8RcOCnxoVkanKozgUE4k25gtIzSNAzkU2vzPz3DVzTvdVKd_iI6tWm4TqwkJHeRNk2d-4vjIOHN8smpfgeufJe4EbkbCvEauSfWEGFVV68pmMlQsWgs4_ZB1YDSY7E5HiDtJT3A90LvPWtEK0952RYX5DcApzJlM49W9kXNvLE-_I2m3zFYQz5zguK2KF_u6e-5HSCZCgJ2LMZRO9P6OSgqpb5CoSl9UOBUkXi1pu4o5_GJ_b_nTn5jkeK5Evm7DO3w4PfBbh8xNGgBhdzvjkUundWMN7_CEnBxilyyB-VyvQaNng4LC4BiFcvNlDTno7U4OTjElqiL66nofuumUtAngROTuqGAehjKzckT1ef2IJ75o4Xn35wiWp2D8wXl1JH1sD8UURGy8P-HlAgAp4NC-S7Okx4r5_fnovD7bNg_qAbc3FbKpfh3UnXU-ZgZf_jlRUsUs0c4V3kvNfrWeDleEBS13EK3IrbLifiPVEjHwtSz0pzQNqXBl-L4GWyapfKXmfxN0vd7RykfJQS3-B8fzSXReAewaNbIo47NBK9oDnmMqj0cNNN4bm-l1TMlosFbZ3JDscYYPMzm46ILO4Mdexhj-8WHtS8l8Ezti087ctgWUeKV2jh3YFD86qxgV5i8tSf2EEFwX19SaNYIoBTdXdtMKW5l4GBuDqtWNdk8YShjCE4FkEnQjhE4C9ph5RYP84dXLBInnBxJ-eUGVkDILyjEcYtZlA7Ga1n-o-qVc6RFeBSGeZvGW-ALRel-bGo5fwSdeG5OIDR46DSt4FqAhJoHYE46xTUj1kMU3z1NdaEdt1R0gTt8lTowDnJvkCpXLeJApQVb7J2_bBdiea361K8J7iNUjmtvwver8V5GzOye2zB39Eg6-_u_JPT-BrbdCZvv9Afk9qZps4irZKxqkUdse-Q6Gm4f-R52GlRu-R8md2v52OgtgMqIi5oLig-AKaMS_xRUlzqL-Qo3jTnNEeL3IA2DbDTTeC9UTM1jn-OV0k8eHTNZp_4Ux4tr5bMfppdb33dg77gE9mpWEkLhwrmse693A="
+                    }
+                ]
+            }
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 14,
+        "completion_tokens": 0,
+        "total_tokens": 14,
+        "cost": 7e-07,
+        "is_byok": false,
+        "prompt_tokens_details": {
+            "cached_tokens": 0
+        },
+        "cost_details": {
+            "upstream_inference_cost": 7e-07,
+            "upstream_inference_prompt_cost": 7e-07,
+            "upstream_inference_completions_cost": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 261,
+            "image_tokens": 0
+        }
+    }
+}

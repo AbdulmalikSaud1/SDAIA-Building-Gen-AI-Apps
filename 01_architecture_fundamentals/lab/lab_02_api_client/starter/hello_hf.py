@@ -22,40 +22,44 @@ def get_api_token():
             "HUGGINGFACE_API_TOKEN not found. "
             "Create a .env file with your token or set the environment variable."
         )
-    if not token.startswith("hf_"):
+    # Accept both HuggingFace (hf_) and OpenRouter (sk-or-v1-) tokens
+    if not (token.startswith("hf_") or token.startswith("sk-or-v1-")):
         raise ValueError(
-            "Invalid Hugging Face token format. Token should start with 'hf_'."
+            "Invalid token format. Expected HuggingFace (hf_) or OpenRouter (sk-or-v1-) token."
         )
     return token
 
 
 # --- Configuration ---
-API_URL = "https://api-inference.huggingface.co/models/"
-MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
+MODEL_ID = "openrouter/auto"  # Auto-select best available free model
 TOKEN = get_api_token()
-HEADERS = {"Authorization": f"Bearer {TOKEN}"}
+HEADERS = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Content-Type": "application/json"
+}
 
 
 # =====================================================================
 # TODO (Step 2): Make your first API call
 #
-# Use requests.post() to send a request to the Hugging Face Inference API.
-#
-# Hints:
-#   - URL: f"{API_URL}{MODEL_ID}"
-#   - Pass `headers=HEADERS`
-#   - Pass a JSON body: {"inputs": prompt, "parameters": {...}}
-#   - Key parameters: max_new_tokens=150, temperature=0.7, return_full_text=False
-#   - Call response.raise_for_status() to catch HTTP errors
-#   - Parse with response.json()
-#   - The generated text is at result[0]["generated_text"]
+# Modified to work with OpenRouter API (chat completions format)
 # =====================================================================
 
 prompt = "Explain what a vector database is in one paragraph:"
 
-# Your code here:
-# response = requests.post(...)
-# response.raise_for_status()
-# result = response.json()
-# print("Generated Text:")
-# print(result[0]["generated_text"])
+# OpenRouter uses chat completion format
+payload = {
+    "model": MODEL_ID,
+    "messages": [{"role": "user", "content": prompt}],
+    "max_tokens": 150,
+    "temperature": 0.7
+}
+
+print(f"Sending request to {MODEL_ID}...")
+response = requests.post(API_URL, headers=HEADERS, json=payload)
+response.raise_for_status()
+result = response.json()
+
+print("\nGenerated Text:")
+print(result["choices"][0]["message"]["content"])
